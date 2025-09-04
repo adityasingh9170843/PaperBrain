@@ -5,29 +5,26 @@ import { RecursiveCharacterTextSplitter } from "@langchain/textsplitters";
 import { GoogleGenAI } from "@google/genai";
 import dotenv from "dotenv";
 import { PineconeStore } from "@langchain/pinecone";
+import { GoogleGenerativeAIEmbeddings } from "@langchain/google-genai";
+import { TaskType } from "@google/generative-ai";
 import { Pinecone as PineconeClient } from "@pinecone-database/pinecone";
 dotenv.config({ quiet: true });
 
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
-async function main() {
-  
 
-  const response = await ai.models.embedContent({
-    model: "gemini-embedding-001",
-    contents: splits,
-  });
 
-  console.log(response.embeddings);
-}
+const embeddings = new GoogleGenerativeAIEmbeddings({
+  model: "text-embedding-004", 
+  task: TaskType.TEXT_EMBEDDING,
+  apiKey: process.env.GOOGLE_GENAI_API_KEY
+});
 
-main();
 
 const pinecone = new PineconeClient({
   apiKey: process.env.PINECONE_API_KEY,
 });
 
 const pineconeIndex = pinecone.Index("pdf-agent");
-const vectorStore = new PineconeStore.fromExistingIndex(embeddings, {
+export const vectorStore = await PineconeStore.fromExistingIndex(embeddings, {
   pineconeIndex,
   maxConcurrency: 5,
 });
@@ -42,5 +39,16 @@ export async function indexTheDocument(filePath) {
   });
 
   const splits = await textSplitter.splitText(docs[0].pageContent);
+
+  const documents = splits.map((chunks)=>{
+    return{
+      pageContent : chunks,
+      metadata : docs[0].metadata
+    }
+  })
+  console.log(documents);
+  await vectorStore.addDocuments(documents);
+  
+
   console.log(splits.length);
 }
