@@ -15,7 +15,7 @@ dotenv.config({ quiet: true });
 const app = express();
 app.use(express.json());
 app.use(cors({
-    origin: ["http://localhost:5173"],
+    origin: ["http://localhost:5173","https://paper-brain.vercel.app/"],
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true
     
