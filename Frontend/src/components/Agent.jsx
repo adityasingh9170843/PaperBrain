@@ -71,7 +71,7 @@ export default function ChatUI() {
         })
       }, 200)
 
-      await axios.post("http://localhost:3000/upload", formData, {
+      await axios.post(`${import.meta.env.VITE_API_URL}/upload`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
       })
 
@@ -82,7 +82,7 @@ export default function ChatUI() {
         setMessages((prev) => [
           ...prev,
           {
-            text: `✨ PDF "${file.name}" has been successfully processed and indexed! You can now ask me questions about its content.`,
+            text: `PDF "${file.name}" has been successfully processed and indexed! You can now ask me questions about its content.`,
             isUser: false,
           },
         ])
@@ -95,7 +95,7 @@ export default function ChatUI() {
       setMessages((prev) => [
         ...prev,
         {
-          text: "❌ Error uploading PDF. Please try again.",
+          text: "Error uploading PDF. Please try again.",
           isUser: false,
         },
       ])
@@ -113,7 +113,7 @@ export default function ChatUI() {
     setIsTyping(true)
 
     try {
-      const res = await axios.post("http://localhost:3000/chat", {
+      const res = await axios.post(`${import.meta.env.VITE_API_URL}/chat`, {
         message,
         conversationId: conversationID,
       })
@@ -122,7 +122,7 @@ export default function ChatUI() {
       setMessages((prev) => [...prev, botMsg])
     } catch (error) {
       console.error(error)
-      setMessages((prev) => [...prev, { text: "❌ Error: Could not get response. Please try again.", isUser: false }])
+      setMessages((prev) => [...prev, { text: "Error: Could not get response. Please try again.", isUser: false }])
     } finally {
       setIsTyping(false)
     }
