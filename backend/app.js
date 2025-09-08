@@ -95,7 +95,7 @@ app.post("/upload", upload.single("pdf"), async (req, res) => {
 
     await indexTheDocument(filePath);
 
-    
+     memory.flushAll();
 
     res.status(200).send("File uploaded and indexed successfully");
   } catch (err) {
